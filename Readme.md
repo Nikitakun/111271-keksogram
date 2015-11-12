@@ -4,7 +4,7 @@
 [![Dependency status][dependency-image]][dependency-url]
 
 * Студент: [Никита Доменикан](https://htmlacademy.ru/profile/id111271).
-* Наставник: `Иван Гунченко`.
+* Наставник: `Иван Гунченко`. 
 
 ### Немного о себе
 
