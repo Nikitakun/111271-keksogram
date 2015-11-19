@@ -72,6 +72,9 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
+    if (xPoint.value + sideSize.value > currentResizer._image.naturalWidth || yPoint.value + sideSize.value > currentResizer._image.naturalHeight) {
+      return false;
+    }
     return true;
   }
 
@@ -86,6 +89,33 @@
    * @type {HTMLFormElement}
    */
   var resizeForm = document.forms['upload-resize'];
+  var xPoint = resizeForm['resize-x'];
+  var yPoint = resizeForm['resize-y'];
+  var sideSize = resizeForm['resize-size'];
+  var forwardButton = document.querySelector('#resize-fwd');
+
+  var chromeFilter = document.querySelector('#upload-filter-chrome');
+  var sepiaFilter = document.querySelector('#upload-filter-sepia');
+
+  function cookieDate() {
+    var dateCheck = new Date();
+    var dateNow = +Date.now();
+    var numericalDate;
+    var sinceBirthday;
+    var cookiePeriod;
+
+    if ( (dateCheck.getMonth() < 9) || (dateCheck.getMonth() === '9' && dateCheck.getDate() < 20) ) {
+      dateCheck.setFullYear( dateCheck.getFullYear() - 1);
+    }
+    dateCheck.setMonth(9);
+    dateCheck.setDate(20);
+    numericalDate = +dateCheck;
+
+    sinceBirthday = dateNow - numericalDate;
+    cookiePeriod = dateNow + sinceBirthday;
+
+    return new Date(cookiePeriod).toUTCString();
+  }
 
   /**
    * Форма добавления фильтра.
@@ -202,6 +232,14 @@
     }
   };
 
+  resizeForm.onchange = function() {
+    if (resizeFormIsValid()) {
+      forwardButton.disabled = false;
+    } else {
+      forwardButton.disabled = true;
+    }
+  };
+
   /**
    * Сброс формы фильтра. Показывает форму кадрирования.
    * @param {Event} evt
@@ -213,6 +251,15 @@
     resizeForm.classList.remove('invisible');
   };
 
+  function loadFilter() {
+    if (docCookies.getItem('filter') === 'sepia') {
+      sepiaFilter.checked = true;
+    }
+    if (docCookies.getItem('filter') === 'chrome') {
+      chromeFilter.checked = true;
+    }
+  }
+  loadFilter();
   /**
    * Отправка формы фильтра. Возвращает в начальное состояние, предварительно
    * записав сохраненный фильтр в cookie.
@@ -220,6 +267,14 @@
    */
   filterForm.onsubmit = function(evt) {
     evt.preventDefault();
+
+    if (sepiaFilter.checked) {
+      document.cookie = 'filter=sepia;expires=' + cookieDate();
+    }
+
+    if (chromeFilter.checked) {
+      document.cookie = 'filter=chrome;expires=' + cookieDate();
+    }
 
     cleanupResizer();
     updateBackground();
