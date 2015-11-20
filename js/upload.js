@@ -104,7 +104,7 @@
     var sinceBirthday;
     var cookiePeriod;
 
-    if ( (dateCheck.getMonth() < 9) || (dateCheck.getMonth() === '9' && dateCheck.getDate() < 20) ) {
+    if ((dateCheck.getMonth() < 9) || (dateCheck.getMonth() === 9 && dateCheck.getDate() < 20)) {
       dateCheck.setFullYear( dateCheck.getFullYear() - 1);
     }
     dateCheck.setMonth(9);
