@@ -1,4 +1,5 @@
-/* global pictures: true */
+/* global Photo: true */
+
 'use strict';
 
 (function() {
@@ -11,32 +12,106 @@
   }
   hideFilters();
 
-  function processTemplate(data) {
-    var template = document.querySelector('#picture-template');
-    var container = template.content.children[0].cloneNode(true);
+  getPictures();
 
-    container.querySelector('.picture-comments').textContent = data.comments;
-    container.querySelector('.picture-likes').textContent = data.likes;
+  var picturesToChange = [];
+  var filteredPictures = [];
+  var currentPage = 0;
 
-    var image = new Image(182, 182);
+  filterBlock.addEventListener('click', function(e) {
+    if (e.target.classList.contains('filters-radio')) {
+      setFilter(e.target.id);
+    }
+  });
 
-    image.onload = function() {
-      container.replaceChild(image, container.querySelector('img'));
-    };
+  function imageDraw() {
+    var windowSize = window.innerHeight;
+    var lastImage = document.querySelector('.picture:last-child').getBoundingClientRect();
 
-    image.onerror = function() {
-      container.classList.add('picture-load-failure');
-    };
-
-    image.src = data.url;
-
-    return container;
+    if (lastImage.bottom - windowSize <= lastImage.height) {
+      showPictures(filteredPictures, ++currentPage);
+    }
   }
 
-  pictures.forEach(function(pictureData) {
-    var elementToAppend = processTemplate(pictureData);
-    document.querySelector('.pictures').appendChild(elementToAppend);
+  window.addEventListener('scroll', function() {
+    clearTimeout(scrollTimeout);
+    var scrollTimeout = setTimeout(imageDraw(), 100);
   });
+
+  function setFilter(id) {
+    filteredPictures = picturesToChange.slice(0);
+
+    switch (id) {
+      case 'filter-popular':
+        filteredPictures = picturesToChange.slice(0);
+        break;
+      case 'filter-new':
+        filteredPictures.map(function(dateString) {
+          Date.parse(dateString.date);
+        });
+        filteredPictures = filteredPictures.sort(function(a, b) {
+          return (b.date) - (a.date);
+        });
+        break;
+      case 'filter-discussed':
+        filteredPictures = filteredPictures.sort(function(a, b) {
+          return b.comments - a.comments;
+        });
+        break;
+    }
+    currentPage = 0;
+    showPictures(filteredPictures, currentPage, true);
+    imageDraw();
+  }
+
+  var picturesBlock = document.querySelector('.pictures');
+
+  var PAGE_SIZE = 12;
+
+  function showPictures(pictures, pageNumber, replace) {
+    if (replace) {
+      var shownPictures = picturesBlock.querySelectorAll('.picture');
+      [].forEach.call(shownPictures, function(element) {
+        picturesBlock.removeChild(element);
+      });
+    }
+    var docFragment = document.createDocumentFragment();
+
+    var from = pageNumber * PAGE_SIZE;
+    var to = from + PAGE_SIZE;
+    var pagePictures = pictures.slice(from, to);
+
+    pagePictures.forEach(function(pictureData) {
+      var pictureToAppend = new Photo(pictureData);
+      pictureToAppend.render();
+      docFragment.appendChild(pictureToAppend.container);
+    });
+    picturesBlock.appendChild(docFragment);
+  }
+
+  function getPictures() {
+    document.querySelector('.pictures').classList.add('pictures-loading');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'data/pictures.json');
+
+    xhr.onload = function(evt) {
+      var serverData = evt.target.response;
+      var pictureArray = JSON.parse(serverData);
+      picturesToChange = pictureArray;
+
+      picturesBlock.classList.remove('pictures-loading');
+
+      setFilter('filter-popular');
+    };
+
+    xhr.onerror = function() {
+      document.querySelector('.pictures').classList.remove('pictures-loading');
+      document.querySelector('.pictures').classList.add('pictures-failure');
+    };
+
+    xhr.send();
+  }
 
   function showFilters() {
     if (filterBlock.classList.contains('hidden')) {
