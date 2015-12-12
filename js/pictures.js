@@ -47,8 +47,11 @@
         filteredPictures = picturesToChange.slice(0);
         break;
       case 'filter-new':
-        filteredPictures.map(function(dateString) {
-          Date.parse(dateString.date);
+        filteredPictures = filteredPictures.filter(function(dateString) {
+          var now = new Date().getMonth();
+          var thirdMonth = now - 3;
+          var pictureMonth = new Date(dateString.date).getMonth();
+          return pictureMonth >= thirdMonth;
         });
         filteredPictures = filteredPictures.sort(function(a, b) {
           return (b.date) - (a.date);
