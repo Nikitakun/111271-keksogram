@@ -1,4 +1,4 @@
-/* global Resizer: true */
+﻿/* global Resizer: true */
 
 /**
  * @fileoverview
@@ -72,7 +72,7 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
-    if (xPoint.value + sideSize.value > currentResizer._image.naturalWidth || yPoint.value + sideSize.value > currentResizer._image.naturalHeight) {
+    if (+xPoint.value + +sideSize.value > currentResizer._image.naturalWidth || +yPoint.value + +sideSize.value > currentResizer._image.naturalHeight) {
       return false;
     }
     return true;
@@ -190,7 +190,7 @@
           resizeForm.classList.remove('invisible');
 
           hideMessage();
-          currentResizer.addEventListener('load', setTimeout(setInitialConstraint, 1));
+          setTimeout(setInitialConstraint, 1);
         });
         fileReader.readAsDataURL(element.files[0]);
       } else {
@@ -234,9 +234,9 @@
 
   function setInitialConstraint() {
     var resizeData = currentResizer.getConstraint();
-    xPoint.value = resizeData.x;
-    yPoint.value = resizeData.y;
-    sideSize.value = resizeData.side;
+    xPoint.value = Math.round(resizeData.x);
+    yPoint.value = Math.round(resizeData.y);
+    sideSize.value = Math.round(resizeData.side);
   }
 
 
