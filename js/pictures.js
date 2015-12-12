@@ -5,6 +5,9 @@
 (function() {
   var filterBlock = document.querySelector('.filters');
 
+/**
+* Прячет переключатели фильтров при загрузке страницы
+*/
   function hideFilters() {
     if (!filterBlock.classList.contains('hidden')) {
       filterBlock.classList.add('hidden');
@@ -19,12 +22,19 @@
   var currentPage = 0;
   var gallery = new Gallery();
 
-  filterBlock.addEventListener('click', function(e) {
-    if (e.target.classList.contains('filters-radio')) {
-      setFilter(e.target.id);
+/**
+* Переключает фильтр при клике
+* @param {Event} evt
+*/
+  filterBlock.addEventListener('click', function(evt) {
+    if (evt.target.classList.contains('filters-radio')) {
+      setFilter(evt.target.id);
     }
   });
 
+/**
+* Заполняет доступное пространство фотографиями
+*/
   function imageDraw() {
     var windowSize = window.innerHeight;
     var lastImage = document.querySelector('.picture:last-child').getBoundingClientRect();
@@ -34,11 +44,18 @@
     }
   }
 
+  /**
+  * Вызывает дорисовку фотографий при прокрутке
+  */
   window.addEventListener('scroll', function() {
     clearTimeout(scrollTimeout);
     var scrollTimeout = setTimeout(imageDraw(), 100);
   });
 
+  /**
+  * Проверяет id выбранного фильтра и отрисосывает новую страницу фотографий
+  * @param {string} id
+  */
   function setFilter(id) {
     filteredPictures = picturesToChange.slice(0);
 
@@ -70,8 +87,17 @@
 
   var picturesBlock = document.querySelector('.pictures');
 
+  /**
+  * @const {number}
+  */
   var PAGE_SIZE = 12;
 
+  /**
+  * Основная функция отрисовки фотографий
+  * @param {Object} pictures
+  * @param {number} pageNumber
+  * @param {boolean} replace
+  */
   function showPictures(pictures, pageNumber, replace) {
     if (replace) {
       var shownPictures = picturesBlock.querySelectorAll('.picture');
@@ -95,11 +121,18 @@
     picturesBlock.appendChild(docFragment);
   }
 
+  /**
+  * Показывает галерею при клике на фотографию
+  * @param {Event} evt
+  */
   function _onClick(evt) {
     evt.preventDefault();
     gallery.show();
   }
 
+  /**
+  * Получает фотографии по AJAX и вставляет их в дефолтный фильтр
+  */
   function getPictures() {
     document.querySelector('.pictures').classList.add('pictures-loading');
 
@@ -124,6 +157,9 @@
     xhr.send();
   }
 
+  /**
+  * Показывает переключатели фильтров
+  */
   function showFilters() {
     if (filterBlock.classList.contains('hidden')) {
       filterBlock.classList.remove('hidden');

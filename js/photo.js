@@ -1,10 +1,18 @@
 'use strict';
 
 (function() {
+  /**
+  * Конструктор для создания списка фотографий
+  * @constructor
+  * @param {Object} data
+  */
   var Photo = function(data) {
     this._data = data;
   };
 
+/**
+* Создает список фотографий по шаблону
+*/
   Photo.prototype.render = function() {
     var template = document.querySelector('#picture-template');
     this.container = template.content.children[0].cloneNode(true);

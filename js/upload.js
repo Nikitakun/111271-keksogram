@@ -88,6 +88,7 @@
    * Форма кадрирования изображения.
    * @type {HTMLFormElement}
    */
+
   var resizeForm = document.forms['upload-resize'];
   var xPoint = resizeForm['resize-x'];
   var yPoint = resizeForm['resize-y'];
@@ -97,6 +98,9 @@
   var chromeFilter = document.querySelector('#upload-filter-chrome');
   var sepiaFilter = document.querySelector('#upload-filter-sepia');
 
+  /**
+  * Вычисляет срок истечения работы cookies
+  */
   function cookieDate() {
     var dateCheck = new Date();
     var dateNow = +Date.now();
@@ -232,6 +236,9 @@
     }
   });
 
+/**
+* Получает изначальное смещение кадра
+*/
   function setInitialConstraint() {
     var resizeData = currentResizer.getConstraint();
     xPoint.value = resizeData.x;
@@ -242,6 +249,9 @@
 
   window.addEventListener('resizerchange', setInitialConstraint);
 
+  /**
+  * Синхронизирует кадрирование изображения с изменением значений формы
+  */
   resizeForm.addEventListener('change', function() {
     currentResizer.setConstraint(+xPoint.value, +yPoint.value, +sideSize.value);
     if (resizeFormIsValid()) {
@@ -262,6 +272,9 @@
     resizeForm.classList.remove('invisible');
   });
 
+  /**
+  * Загружает фильтр из cookies
+  */
   function loadFilter() {
     if (docCookies.getItem('filter') === 'sepia') {
       sepiaFilter.checked = true;

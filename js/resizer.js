@@ -119,7 +119,8 @@
           this._resizeConstraint.side - this._ctx.lineWidth / 2,
           this._resizeConstraint.side - this._ctx.lineWidth / 2);
 
-      /* Рамка из точек
+      /**
+      * Рамка из точек
       this._ctx.fillStyle = '#ffe753';
       var circleShift;
       for (circleShift = 0; circleShift <= this._resizeConstraint.side - 1.5; circleShift += this._ctx.lineWidth + 1.5) {
