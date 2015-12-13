@@ -11,5 +11,6 @@
     EmptyConstructor.prototype = parent.prototype;
     child.prototype = new EmptyConstructor();
   }
-  console.log(inherit); // Использование переменной, чтоб не ругался ESLint
+
+  window.inherit = inherit;
 })();
