@@ -1,4 +1,4 @@
-﻿/* global Resizer: true */
+/* global Resizer: true */
 
 /**
  * @fileoverview
