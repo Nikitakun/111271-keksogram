@@ -1,4 +1,4 @@
-/* global Photo: true, Gallery: true*/
+/* global Photo: true, Gallery: true, PhotoData: true */
 
 'use strict';
 
@@ -19,6 +19,7 @@
 
   var picturesToChange = [];
   var filteredPictures = [];
+  var shownPictures = [];
   var currentPage = 0;
   var gallery = new Gallery();
 
@@ -40,7 +41,9 @@
     var lastImage = document.querySelector('.picture:last-child').getBoundingClientRect();
 
     if (lastImage.bottom - windowSize <= lastImage.height) {
-      showPictures(filteredPictures, ++currentPage);
+      if (currentPage < Math.ceil(filteredPictures.length / PAGE_SIZE)) {
+        showPictures(filteredPictures, ++currentPage);
+      }
     }
   }
 
@@ -67,21 +70,22 @@
         filteredPictures = filteredPictures.filter(function(dateString) {
           var now = new Date().getMonth();
           var thirdMonth = now - 3;
-          var pictureMonth = new Date(dateString.date).getMonth();
+          var pictureMonth = new Date(dateString.getDateInfo()).getMonth();
           return pictureMonth >= thirdMonth;
         });
         filteredPictures = filteredPictures.sort(function(a, b) {
-          return (b.date) - (a.date);
+          return (b.getDateInfo()) - (a.getDateInfo());
         });
         break;
       case 'filter-discussed':
         filteredPictures = filteredPictures.sort(function(a, b) {
-          return b.comments - a.comments;
+          return b.getCommentsInfo() - a.getCommentsInfo();
         });
         break;
     }
     currentPage = 0;
     showPictures(filteredPictures, currentPage, true);
+    gallery.setPictures(filteredPictures);
     imageDraw();
   }
 
@@ -100,10 +104,12 @@
   */
   function showPictures(pictures, pageNumber, replace) {
     if (replace) {
-      var shownPictures = picturesBlock.querySelectorAll('.picture');
-      [].forEach.call(shownPictures, function(element) {
-        picturesBlock.removeChild(element);
-      });
+      var firstElement;
+      while ((firstElement = shownPictures.shift())) {
+        picturesBlock.removeChild(firstElement.container);
+        firstElement._onClick = null;
+        firstElement.hide();
+      }
     }
     var docFragment = document.createDocumentFragment();
 
@@ -111,23 +117,28 @@
     var to = from + PAGE_SIZE;
     var pagePictures = pictures.slice(from, to);
 
-    pagePictures.forEach(function(pictureData) {
-      var pictureToAppend = new Photo(pictureData);
-      pictureToAppend.render();
+    shownPictures = shownPictures.concat(pagePictures.map(function(pictureData, i) {
+      var pictureToAppend = new Photo();
+      pictureToAppend.setData(pictureData);
+
+      var counter;
+      if (pageNumber > 0) {
+        counter = from + i;
+      } else {
+        counter = i;
+      }
+
+      pictureToAppend.show();
       docFragment.appendChild(pictureToAppend.container);
 
-      pictureToAppend.container.addEventListener('click', _onClick);
-    });
-    picturesBlock.appendChild(docFragment);
-  }
+      pictureToAppend.onClick = function() {
+        gallery.setCurrentPicture(counter);
+        gallery.show();
+      };
 
-  /**
-  * Показывает галерею при клике на фотографию
-  * @param {Event} evt
-  */
-  function _onClick(evt) {
-    evt.preventDefault();
-    gallery.show();
+      return pictureToAppend;
+    }));
+    picturesBlock.appendChild(docFragment);
   }
 
   /**
@@ -142,7 +153,9 @@
     xhr.onload = function(evt) {
       var serverData = evt.target.response;
       var pictureArray = JSON.parse(serverData);
-      picturesToChange = pictureArray;
+      picturesToChange = pictureArray.map(function(photo) {
+        return new PhotoData(photo);
+      });
 
       picturesBlock.classList.remove('pictures-loading');
 

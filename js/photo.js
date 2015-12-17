@@ -1,24 +1,29 @@
+/* global PhotoBase: true, inherit: true */
+
 'use strict';
 
 (function() {
   /**
   * Конструктор для создания списка фотографий
   * @constructor
-  * @param {Object} data
+  * @extends {PhotoBase}
   */
-  var Photo = function(data) {
-    this._data = data;
+  var Photo = function() {
+    this._onClick = this._onClick.bind(this);
   };
+
+  inherit(Photo, PhotoBase);
 
 /**
 * Создает список фотографий по шаблону
+* @override
 */
-  Photo.prototype.render = function() {
+  Photo.prototype.show = function() {
     var template = document.querySelector('#picture-template');
     this.container = template.content.children[0].cloneNode(true);
 
-    this.container.querySelector('.picture-comments').textContent = this._data.comments;
-    this.container.querySelector('.picture-likes').textContent = this._data.likes;
+    this.container.querySelector('.picture-comments').textContent = this.getData().getCommentsInfo();
+    this.container.querySelector('.picture-likes').textContent = this.getData().getLikesInfo();
 
     var image = new Image(182, 182);
 
@@ -30,7 +35,33 @@
       this.container.classList.add('picture-load-failure');
     }.bind(this);
 
-    image.src = this._data.url;
+    if (this.getData().getPreviewInfo()) {
+      image.src = this.getData().getPreviewInfo();
+    } else {
+      image.src = this.getData().getSourceInfo();
+    }
+
+    this.container.addEventListener('click', this._onClick);
+  };
+
+  /**
+  * Удаляет обработчик события (нужно при клике на фильтр)
+  * @override
+  */
+  Photo.prototype.hide = function() {
+    this.container.removeEventListener('click', this._onClick);
+  };
+
+  /**
+  * @override
+  */
+  Photo.prototype._onClick = function(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === 'IMG' && !this.container.classList.contains('picture-load-failure')) {
+      if (typeof this.onClick === 'function') {
+        this.onClick();
+      }
+    }
   };
 
   window.Photo = Photo;
