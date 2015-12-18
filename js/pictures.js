@@ -17,6 +17,7 @@
 
   getPictures();
 
+  var activeFilter = localStorage.getItem('activeFilter') || 'filter-popular';
   var picturesToChange = [];
   var filteredPictures = [];
   var shownPictures = [];
@@ -87,6 +88,8 @@
     showPictures(filteredPictures, currentPage, true);
     gallery.setPictures(filteredPictures);
     imageDraw();
+
+    localStorage.setItem('activeFilter', id);
   }
 
   var picturesBlock = document.querySelector('.pictures');
@@ -159,7 +162,9 @@
 
       picturesBlock.classList.remove('pictures-loading');
 
-      setFilter('filter-popular');
+      filterBlock.querySelector('#' + activeFilter).checked = true;
+
+      setFilter(activeFilter);
     };
 
     xhr.onerror = function() {
