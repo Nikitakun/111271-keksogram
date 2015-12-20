@@ -48,6 +48,7 @@
   * Действия, производимые при исчезновении галереи
   */
   PhotoPreview.prototype.hide = function() {
+    location.hash = '';
     this._galleryContainer.classList.add('invisible');
     document.removeEventListener('keydown', this._onDocumentKeyDown);
     this._image.removeEventListener('click', this._onPhotoClick);

@@ -18,13 +18,16 @@
     this._closeButton = this._galleryContainer.querySelector('.gallery-overlay-close');
 
     this._currentPicture = 0;
-    this._liked = false;
 
     this._onDocumentKeyDown = this._onDocumentKeyDown.bind(this);
     this._onPhotoClick = this._onPhotoClick.bind(this);
     this._onCloseClick = this._onCloseClick.bind(this);
     this._onLikeClick = this._onLikeClick.bind(this);
     this._onVideoClick = this._onVideoClick.bind(this);
+    this._checkHash = this._checkHash.bind(this);
+
+    window.addEventListener('hashchange', this._checkHash);
+    window.addEventListener('load', this._checkHash);
   };
 
   inherit(Gallery, PhotoPreview);
@@ -43,7 +46,8 @@
   */
   Gallery.prototype._onPhotoClick = function() {
     if (this._currentPicture <= this._data.length - 2) {
-      this.setCurrentPicture(++this._currentPicture);
+      ++this._currentPicture;
+      this._changeHash(this._data[this._currentPicture].getSourceInfo());
       if (!this._data[this._currentPicture].liked && this._likes.classList.contains('likes-count-liked')) {
         this._likes.classList.remove('likes-count-liked');
       }
@@ -103,7 +107,8 @@
     }
     if (evt.keyCode === 37 && this._currentPicture > 0) {
       this.removeVideo();
-      this.setCurrentPicture(--this._currentPicture);
+      --this._currentPicture;
+      this._changeHash(this._data[this._currentPicture].getSourceInfo());
       if (!this._data[this._currentPicture].liked && this._likes.classList.contains('likes-count-liked')) {
         this._likes.classList.remove('likes-count-liked');
       }
@@ -112,7 +117,8 @@
     }
     if (evt.keyCode === 39 && this._currentPicture <= this._data.length - 2) {
       this.removeVideo();
-      this.setCurrentPicture(++this._currentPicture);
+      ++this._currentPicture;
+      this._changeHash(this._data[this._currentPicture].getSourceInfo());
       if (!this._data[this._currentPicture].liked && this._likes.classList.contains('likes-count-liked')) {
         this._likes.classList.remove('likes-count-liked');
       }
@@ -130,24 +136,43 @@
 
   /**
   * Заполняет галерею либо фотографиями, либо видео
-  * @param {Number} i
+  * @param {string} i
   */
-  Gallery.prototype.setCurrentPicture = function(i) {
-    this._currentPicture = i;
+  Gallery.prototype.setCurrentPicture = function(URL) {
+    this._data.forEach(function(object, i) {
+      if (object.getSourceInfo() === URL) {
+        this._currentPicture = i;
+        if (object.getPreviewInfo()) {
+          this._video.src = URL;
+          this._galleryContainer.querySelector('.gallery-overlay-preview').replaceChild(this._video, this._image);
+          this._video.autoplay = true;
+        } else {
+          this._image.src = URL;
+        }
+        this._likes.textContent = object.getLikesInfo();
+        this._comment.textContent = object.getCommentsInfo();
 
-    if (this._data[i].getPreviewInfo()) {
-      this._video.src = this._data[i].getSourceInfo();
-      this._galleryContainer.querySelector('.gallery-overlay-preview').replaceChild(this._video, this._image);
-      this._video.autoplay = true;
-    } else {
-      this._image.src = this._data[i].getSourceInfo();
-    }
+        if (object.liked) {
+          this._likes.classList.add('likes-count-liked');
+        }
+      }
+    }.bind(this));
+  };
 
-    this._likes.textContent = this._data[i].getLikesInfo();
-    this._comment.textContent = this._data[i].getCommentsInfo();
+  /**
+  * @param {string} newHash
+  */
+  Gallery.prototype._changeHash = function(newHash) {
+    location.hash = 'photo/' + newHash;
+  };
 
-    if (this._data[this._currentPicture].liked) {
-      this._likes.classList.add('likes-count-liked');
+  /**
+  * Записывает в галерею нужную фотографию в зависимости от значения хэша
+  */
+  Gallery.prototype._checkHash = function() {
+    if (location.hash.match(/#photo\/(\S+)/)) {
+      this.setCurrentPicture(location.hash.slice(7));
+      this.show();
     }
   };
 

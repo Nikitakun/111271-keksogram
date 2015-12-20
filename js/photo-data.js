@@ -6,7 +6,6 @@
   */
   var PhotoData = function(data) {
     this._mediaInfo = data;
-    this._liked = false;
   };
 
   /**
@@ -29,6 +28,18 @@
   */
   PhotoData.prototype.setLikes = function(like) {
     this._mediaInfo.likes = like;
+  };
+
+  PhotoData.prototype.addLiked = function() {
+    this._mediaInfo._liked = true;
+  };
+
+  PhotoData.prototype.removeLiked = function() {
+    this._mediaInfo._liked = false;
+  };
+
+  PhotoData.prototype.checkIfLiked = function() {
+    return this._mediaInfo._liked;
   };
 
   /**

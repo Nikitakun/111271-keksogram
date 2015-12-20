@@ -120,23 +120,15 @@
     var to = from + PAGE_SIZE;
     var pagePictures = pictures.slice(from, to);
 
-    shownPictures = shownPictures.concat(pagePictures.map(function(pictureData, i) {
+    shownPictures = shownPictures.concat(pagePictures.map(function(pictureData) {
       var pictureToAppend = new Photo();
       pictureToAppend.setData(pictureData);
-
-      var counter;
-      if (pageNumber > 0) {
-        counter = from + i;
-      } else {
-        counter = i;
-      }
 
       pictureToAppend.show();
       docFragment.appendChild(pictureToAppend.container);
 
       pictureToAppend.onClick = function() {
-        gallery.setCurrentPicture(counter);
-        gallery.show();
+        gallery._changeHash(pictureToAppend.getData().getSourceInfo());
       };
 
       return pictureToAppend;
