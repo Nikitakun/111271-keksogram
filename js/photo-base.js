@@ -1,6 +1,8 @@
+/* global define: true */
+
 'use strict';
 
-(function() {
+define(function() {
   /**
   * @constructor
   */
@@ -26,5 +28,5 @@
     return this._data;
   };
 
-  window.PhotoBase = PhotoBase;
-})();
+  return PhotoBase;
+});

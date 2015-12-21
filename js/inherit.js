@@ -1,6 +1,8 @@
+/* global define: true */
+
 'use strict';
 
-(function() {
+define(function() {
   /**
   * Записывает свойства родителя в дочерний конструктор
   * @param {Constructor} child
@@ -12,5 +14,5 @@
     child.prototype = new EmptyConstructor();
   }
 
-  window.inherit = inherit;
-})();
+  return inherit;
+});

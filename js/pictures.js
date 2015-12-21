@@ -1,8 +1,17 @@
-/* global Photo: true, Gallery: true, PhotoData: true */
+/* global requirejs: true, define: true */
 
 'use strict';
 
-(function() {
+requirejs.config({
+  baseUrl: 'js'
+});
+
+define([
+  'photo',
+  'gallery',
+  'photo-data',
+  'upload'
+], function(Photo, Gallery, PhotoData) {
   var filterBlock = document.querySelector('.filters');
 
 /**
@@ -176,4 +185,4 @@
     }
   }
   showFilters();
-})();
+});

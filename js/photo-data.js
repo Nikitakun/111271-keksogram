@@ -1,6 +1,8 @@
+/* global define: true */
+
 'use strict';
 
-(function() {
+define(function() {
   /**
   * @constructor
   */
@@ -63,5 +65,5 @@
     return this._mediaInfo.preview;
   };
 
-  window.PhotoData = PhotoData;
-})();
+  return PhotoData;
+});

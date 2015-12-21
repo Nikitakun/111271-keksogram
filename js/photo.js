@@ -1,8 +1,11 @@
-/* global PhotoBase: true, inherit: true */
+/* global define: true */
 
 'use strict';
 
-(function() {
+define([
+  'photo-base',
+  'inherit'
+], function(PhotoBase, inherit) {
   /**
   * Конструктор для создания списка фотографий
   * @constructor
@@ -64,5 +67,5 @@
     }
   };
 
-  window.Photo = Photo;
-})();
+  return Photo;
+});

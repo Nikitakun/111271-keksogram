@@ -1,8 +1,11 @@
-/* global PhotoBase: true, inherit: true*/
+/* global define: true */
 
 'use strict';
 
-(function() {
+define([
+  'photo-base',
+  'inherit'
+], function(PhotoBase, inherit) {
   /**
   * @constructor
   * @extends {PhotoBase}
@@ -59,5 +62,5 @@
     this.removeVideo();
   };
 
-  window.PhotoPreview = PhotoPreview;
-})();
+  return PhotoPreview;
+});

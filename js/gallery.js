@@ -1,8 +1,11 @@
-/* global PhotoPreview: true, inherit: true */
+/* global define: true */
 
 'use strict';
 
-(function() {
+define([
+  'photo-preview',
+  'inherit'
+], function(PhotoPreview, inherit) {
   /**
   * Конструктор для создания галереи
   * @constructor
@@ -176,5 +179,5 @@
     }
   };
 
-  window.Gallery = Gallery;
-})();
+  return Gallery;
+});
